@@ -1,9 +1,14 @@
 
 CONFIG = {
-    'home_dir': "D:\\Work\\Pawn",
+    'home_dir': "D:\\py\\Pawn",
     'browser': 'chrome',  # chrome, firefox
 
-    # 나
+    # 네이버
     'naver_id': 'syban75',
-    'naver_pw': '~SeYoun88!!',
+    'naver_pw': '',
+
+    # cgv
+    'cgv_id': 'syban75',
+    'cgv_pw': 'syban123!!',
+
 }
