@@ -1,0 +1,68 @@
+package com.syban.sylvan;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+//import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
+
+
+import javax.annotation.PostConstruct;
+import java.net.URI;
+
+@Controller
+//@RefreshScope
+public class SylvanController {
+
+	private static final Logger logger = LoggerFactory.getLogger(SylvanController.class);
+
+	@Autowired
+	private RestTemplate searchClient;
+
+//	@RequestMapping("/")
+//	public String home() {
+//		return "index.html";
+//	}
+
+	@RequestMapping("/test")
+	@ResponseBody
+	public String test() {
+		System.out.println(">>>>>>>>>>>>> password is: " + password);
+		return "result is "+ password;
+	}
+
+	@Value("${password:}")
+	String password;
+
+	@PostConstruct
+	private void postConstruct() {
+
+		System.out.println("My password is: " + password);
+	}
+
+	
+	@RequestMapping("/restvaccine")
+	@ResponseBody
+	public String restvaccine() {
+
+		return "restvaccine is "+ password;
+	}
+	
+}
+
+@Configuration
+class AppConfiguration {
+	
+	@Bean
+	RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+}
