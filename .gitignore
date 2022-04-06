@@ -1,3 +1,11 @@
-.idea/*
-.metadata/*
-.__pycache__/*
+.idea
+.metadata
+.__pycache__
+
+Pawn/.idea
+Pawn/.metadata
+Pawn/.__pycache__
+
+Sylvan/.idea
+Sylvan/.metadata
+Sylvan/.__pycache__
