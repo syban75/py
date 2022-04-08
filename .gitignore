@@ -1,3 +1,6 @@
 .idea/
 .metadata/
 __pycache__/
+chromedriver.exe
+*.iml
+*.log

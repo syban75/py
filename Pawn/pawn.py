@@ -1,5 +1,6 @@
 import os
 
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
@@ -95,7 +96,6 @@ def login_naver():
         logger.info("login_naver 실패: %s " % ex)
 
 
-
 # cgv 로그인
 def login_cgv():
     logger = logging.getLogger("login_cgv")
@@ -171,6 +171,43 @@ def login_cgv():
         logger.info("login_cgv 실패: %s " % ex)
 
 
+# line으로 메세지 보내기
+def send_line_message(message):
+    try:
+        logger = logging.getLogger("send_line_message")
+
+        target_url = 'https://notify-api.line.me/api/notify'
+
+        token = 'ItqrfEgdlYJdQf5Rb2ktrogNvd0rBF97wD8lhpE5nK5'
+
+        response = requests.post(
+            target_url,
+            headers={
+
+                'Authorization': 'Bearer ' + token
+
+            },
+            data={
+
+                'message': message
+            }
+        )
+
+        logger.info(response)
+
+    except Exception as ex:
+        logger.info("check_strange 실패: %s " % ex)
+
+
+# 영화가 예약상태가 되었는지 확인하고 알람
+def check_strange(driver):
+    logger = logging.getLogger("check_strange")
+    try:
+        print("")
+
+    except Exception as ex:
+        logger.info("check_strange 실패: %s " % ex)
+
 
 #
 # main
@@ -178,13 +215,13 @@ def login_cgv():
 logger = logging.getLogger("main")
 logging.info('start pawn in %s' % os.getcwd())
 
-
 # naver으로 login
 my_driver = login_cgv()
 
 # 확인 루프
 for count in range(1, 100000):
 
+    check_strange(my_driver)
 
     # 가끔식 화면 refresh
     if count % 30 == 0:
@@ -192,6 +229,9 @@ for count in range(1, 100000):
 
         my_driver.get('https://www.cgv.co.kr/default.aspx')
 
+    # 가끔식 메세지 보내기
+    if count % 30 == 0:
+        send_line_message("닥터스트레인지2는 아직 예약 가능하지 않음.")
 
     # 매크로방지 피하기 위해서 1초~3초 랜덤하게 쉬기
     time.sleep(random.randrange(1, 3))
