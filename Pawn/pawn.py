@@ -2,6 +2,7 @@ import os
 
 import requests
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 import time
 import pyperclip
@@ -160,10 +161,9 @@ def login_cgv():
         # cgv 이동
         time.sleep(1)
 
-        driver.get('https://www.cgv.co.kr/default.aspx')
-        # driver.get('http://www.cgv.co.kr/movies/detail-view/?midx=85715')
-
-        time.sleep(1)
+        #driver.get('https://www.cgv.co.kr/default.aspx')
+        #driver.get('http://www.cgv.co.kr/movies/detail-view/?midx=85715')
+        #time.sleep(1)
 
         return driver
 
@@ -196,17 +196,31 @@ def send_line_message(message):
         logger.info(response)
 
     except Exception as ex:
-        logger.info("check_strange 실패: %s " % ex)
+        logger.info("send_line_message 실패: %s " % ex)
 
 
 # 영화가 예약상태가 되었는지 확인하고 알람
-def check_strange(driver):
+def check_strange(driver, movie_url):
     logger = logging.getLogger("check_strange")
     try:
-        print("")
+        driver.get(movie_url)
+
+        btn_reservation = driver.find_element_by_class_name("link-reservation")
+
+        print(btn_reservation)
+
+        send_line_message("닥터스트레인지2 예약 버튼 활성화!!")
+
+        return True
+
+    except NoSuchElementException:
+        logger.info("DrStrange Booking is not available")
+        return False
 
     except Exception as ex:
         logger.info("check_strange 실패: %s " % ex)
+
+    return False
 
 
 #
@@ -218,19 +232,27 @@ logging.info('start pawn in %s' % os.getcwd())
 # naver으로 login
 my_driver = login_cgv()
 
+strange_url = 'http://www.cgv.co.kr/movies/detail-view/?midx=85715'
+#strange_url = 'http://www.cgv.co.kr/movies/detail-view/?midx=85712'
+
 # 확인 루프
 for count in range(1, 100000):
 
-    check_strange(my_driver)
+    booking = check_strange(my_driver,strange_url)
+
+    if booking is True:
+        send_line_message("닥터스트레인지2 예약 가능!! \n %s" % strange_url)
+
+        break
 
     # 가끔식 화면 refresh
     if count % 30 == 0:
         my_driver.switch_to.window(my_driver.window_handles[0])
 
-        my_driver.get('https://www.cgv.co.kr/default.aspx')
+        my_driver.get(strange_url)
 
     # 가끔식 메세지 보내기
-    if count % 30 == 0:
+    if count % 30 == 0 and booking is False:
         send_line_message("닥터스트레인지2는 아직 예약 가능하지 않음.")
 
     # 매크로방지 피하기 위해서 1초~3초 랜덤하게 쉬기
