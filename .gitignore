@@ -4,3 +4,4 @@ __pycache__/
 chromedriver.exe
 *.iml
 *.log
+*.swp
