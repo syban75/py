@@ -34,7 +34,8 @@ def login_naver():
             #
 
             options = webdriver.ChromeOptions()
-            options.add_argument("user-data-dir=C:\\Users\\user\\AppData\\Local\\Google\\Chrome\\User Data")
+            options.add_argument("user-data-dir=C:\\Users\\syban\\AppData\\Local\\Google\\Chrome\\User Data")
+            # options.add_argument("user-data-dir=D:\\py\\Pawn\\Chrome\\User Data")
 
             # options.add_argument("start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -109,7 +110,7 @@ def login_cgv():
             #
 
             options = webdriver.ChromeOptions()
-            options.add_argument("user-data-dir=C:\\Users\\user\\AppData\\Local\\Google\\Chrome\\User Data")
+            options.add_argument("user-data-dir=C:\\Users\\syban\\AppData\\Local\\Google\\Chrome\\User Data")
 
             # options.add_argument("start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -178,7 +179,7 @@ def send_line_message(message):
 
         target_url = 'https://notify-api.line.me/api/notify'
 
-        token = 'ItqrfEgdlYJdQf5Rb2ktrogNvd0rBF97wD8lhpE5nK5'
+        token = config.CONFIG["line_token"]
 
         response = requests.post(
             target_url,
@@ -226,8 +227,11 @@ def check_strange(driver, movie_url):
 #
 # main
 #
+
 logger = logging.getLogger("main")
 logging.info('start pawn in %s' % os.getcwd())
+
+send_line_message("닥터스트레인지2 예매 확인 시작")
 
 # naver으로 login
 my_driver = login_cgv()
@@ -241,7 +245,7 @@ for count in range(1, 100000):
     booking = check_strange(my_driver,strange_url)
 
     if booking is True:
-        send_line_message("닥터스트레인지2 예약 가능!! \n %s" % strange_url)
+        send_line_message("닥터스트레인지2 예매 가능!! \n %s" % strange_url)
 
         break
 
@@ -252,8 +256,8 @@ for count in range(1, 100000):
         my_driver.get(strange_url)
 
     # 가끔식 메세지 보내기
-    if count % 30 == 0 and booking is False:
-        send_line_message("닥터스트레인지2는 아직 예약 가능하지 않음.")
+    #if count % 30 == 0 and booking is False:
+    #    send_line_message("닥터스트레인지2는 아직 예매 가능하지 않음.")
 
     # 매크로방지 피하기 위해서 1초~3초 랜덤하게 쉬기
     time.sleep(random.randrange(1, 3))
