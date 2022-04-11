@@ -34,8 +34,8 @@ def login_naver():
             #
 
             options = webdriver.ChromeOptions()
-            options.add_argument("user-data-dir=C:\\Users\\syban\\AppData\\Local\\Google\\Chrome\\User Data")
-            # options.add_argument("user-data-dir=D:\\py\\Pawn\\Chrome\\User Data")
+            options.add_argument("user-data-dir=C:\\Users\\%s\\AppData\\Local\\Google\\Chrome\\User Data" %
+                                 (config.CONFIG['login_id']))
 
             # options.add_argument("start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -110,7 +110,8 @@ def login_cgv():
             #
 
             options = webdriver.ChromeOptions()
-            options.add_argument("user-data-dir=C:\\Users\\syban\\AppData\\Local\\Google\\Chrome\\User Data")
+            options.add_argument("user-data-dir=C:\\Users\\%s\\AppData\\Local\\Google\\Chrome\\User Data" %
+                                 (config.CONFIG['login_id']))
 
             # options.add_argument("start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -133,7 +134,10 @@ def login_cgv():
                                           '\\2cyrg3xs.default-release')
             driver = webdriver.Firefox(firefox_profile=fp)
 
-        driver.get('https://www.cgv.co.kr/user/login/?returnURL=https%3a%2f%2fwww.cgv.co.kr%2fdefault.aspx')
+        # logout if login
+        logout_cgv(driver);
+
+        driver.get('https://www.cgv.co.kr/user/login')
 
         # id, pw 입력할 곳을 찾습니다.
         tag_id = driver.find_element_by_name('txtUserId')
@@ -162,9 +166,9 @@ def login_cgv():
         # cgv 이동
         time.sleep(1)
 
-        #driver.get('https://www.cgv.co.kr/default.aspx')
-        #driver.get('http://www.cgv.co.kr/movies/detail-view/?midx=85715')
-        #time.sleep(1)
+        # driver.get('https://www.cgv.co.kr/default.aspx')
+        # driver.get('http://www.cgv.co.kr/movies/detail-view/?midx=85715')
+        # time.sleep(1)
 
         return driver
 
@@ -200,6 +204,29 @@ def send_line_message(message):
         logger.info("send_line_message 실패: %s " % ex)
 
 
+# cgv logout
+def logout_cgv(driver):
+    logger = logging.getLogger("check_login")
+    try:
+
+        driver.get('https://www.cgv.co.kr/user/login')
+
+        btn_logout = driver.find_element_by_class_name("logout")
+
+        btn_logout.click()
+
+        return True
+
+    except NoSuchElementException:
+        logger.info("Not login")
+        return False
+
+    except Exception as ex:
+        logger.info("check_login 실패: %s " % ex)
+
+    return False
+
+
 # 영화가 예약상태가 되었는지 확인하고 알람
 def check_strange(driver, movie_url):
     logger = logging.getLogger("check_strange")
@@ -207,6 +234,10 @@ def check_strange(driver, movie_url):
         driver.get(movie_url)
 
         btn_reservation = driver.find_element_by_class_name("link-reservation")
+
+        if not btn_reservation.is_enabled() :
+            logger.info("DrStrange Booking button is not available")
+            return False
 
         print(btn_reservation)
 
@@ -231,18 +262,18 @@ def check_strange(driver, movie_url):
 logger = logging.getLogger("main")
 logging.info('start pawn in %s' % os.getcwd())
 
-send_line_message("닥터스트레인지2 예매 확인 시작")
+# send_line_message("닥터스트레인지2 예매 확인 시작")
 
 # naver으로 login
 my_driver = login_cgv()
 
 strange_url = 'http://www.cgv.co.kr/movies/detail-view/?midx=85715'
-#strange_url = 'http://www.cgv.co.kr/movies/detail-view/?midx=85712'
+# strange_url = 'http://www.cgv.co.kr/movies/detail-view/?midx=85712'
 
 # 확인 루프
 for count in range(1, 100000):
 
-    booking = check_strange(my_driver,strange_url)
+    booking = check_strange(my_driver, strange_url)
 
     if booking is True:
         send_line_message("닥터스트레인지2 예매 가능!! \n %s" % strange_url)
@@ -256,7 +287,7 @@ for count in range(1, 100000):
         my_driver.get(strange_url)
 
     # 가끔식 메세지 보내기
-    #if count % 30 == 0 and booking is False:
+    # if count % 30 == 0 and booking is False:
     #    send_line_message("닥터스트레인지2는 아직 예매 가능하지 않음.")
 
     # 매크로방지 피하기 위해서 1초~3초 랜덤하게 쉬기
